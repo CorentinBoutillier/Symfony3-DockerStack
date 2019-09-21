@@ -2,9 +2,9 @@ version: '3'
 
 services:
 
-  cb-symfony-nginx:
-    container_name: cb-symfony-nginx
-    hostname: cb-symfony-nginx
+  nginx:
+    container_name: nginx
+    hostname: nginx
     build: build/nginx
     labels:
       - "traefik.backend=cb-symfony"
@@ -15,16 +15,16 @@ services:
     volumes:
       - ./html:/var/www/html
     depends_on:
-      - cb-symfony-php
+      - php
     links:
-      - cb-symfony-mysql
+      - mysql
     networks:
       - cb-symfony
       - traefik-proxy
 
-  cb-symfony-php:
-    container_name: cb-symfony-php
-    hostname: cb-symfony-php
+  php:
+    container_name: php
+    hostname: php
     build: build/PHP
     volumes:
       - ./html:/var/www/html
@@ -32,7 +32,7 @@ services:
     networks:
       - cb-symfony
 
-  cb-symfony-mysql:
+  mysql:
     image: mysql:5.7
     volumes:
       - mysqlData:/var/lib/mysql
@@ -43,22 +43,22 @@ services:
         MYSQL_PASSWORD: mydbpassword
     ports:
       - "3306:3306"
-    container_name: cb-symfony-mysql
+    container_name: mysql
     networks:
       - cb-symfony
 
-  cb-symfony-phpmyadmin:
+  phpmyadmin:
     image: phpmyadmin/phpmyadmin
-    container_name: cb-symfony-phpmyadmin
+    container_name: phpmyadmin
     restart: always
     ports:
       - "8080:80"
     depends_on:
-      - cb-symfony-mysql
+      - mysql
     links:
-      - cb-symfony-mysql:db
+      - mysql:db
     environment:
-        PMA_HOST: cb-symfony-mysql
+        PMA_HOST: mysql
         PMA_PORT: 3306
     networks:
       - cb-symfony
